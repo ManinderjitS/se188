@@ -1,3 +1,6 @@
+#pip install scipy
+#pip install scikit-sklearn
+#pip install pandas
 from django.shortcuts import render
 from django.http import HttpResponse
 from .forms import ImportantClassifiersForm
@@ -33,7 +36,9 @@ def show_result(request):
 def show_table_of_database(request):
     print("inside show database")
     template_name = 'show_table_of_database.html'
-    path_to_file = "/home/maninder/School/SE188/project/"
+    #what ever ur path is
+    #saving for later use :- /home/sukhi/School/CollegeM/se188/project/, /home/maninder/School/SE188/project/
+    path_to_file = "/home/sukhi/School/CollegeM/se188/project/"
 
     county_df = pd.read_csv(path_to_file + "County.csv", header = [0])
     mapping_df = pd.read_csv(path_to_file +"Mapping.csv", header = [0])
@@ -129,7 +134,13 @@ def show_table_of_database(request):
 
     print('Accuracy for given train:test split 1 = ', accuracy_score(y_test, y_predictions))
 
+    first_ten = data_df.head(10)
     context = {
         'master_kickstarter_df':master_kickstarter_df,
+        'first_ten':first_ten
     }
     return render(request, template_name, context)
+
+def change_df_col_type(df, indexes, type):
+    for i in indexes:
+        df[i] = df[i].astype(type)
