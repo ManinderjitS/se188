@@ -1,0 +1,13 @@
+<table id = 'datatable'>
+<h1> These are the columns list</h1>
+{% for i in column_list %}
+<tr>
+    <br> {{i}}
+</tr
+{% endfor %}
+</table>
+
+<h1> Results are as follows: </h1>
+<br> Results_dtc : {{result_dtc_fit}}
+<br> Score_dtc: {{score_dtc_fit}}
+<br> Accuracy: {{accuracy_score}}
