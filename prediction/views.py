@@ -90,22 +90,6 @@ def initialize_dataframes():
 
 def seperate_target_and_data():
     global target_df, data_df
-    #different statuses
-    #   ['successful', 'failed', 'live', 'canceled', 'suspended']
-    #Series - is one dimensional i think
-    a = master_kickstarter_df.loc[master_kickstarter_df["status"] == "failed"]["goal"]
-    b = master_kickstarter_df.loc[master_kickstarter_df["status"] == "failed"]["pledged"]
-    c = a - b
-    #c is a 'pandas.core.series.Series'from sklearn.model_selection import train_test_split
-    #get the dataframes of the of the datasets of different statuses
-    a1 = master_kickstarter_df.loc[master_kickstarter_df["status"] == "successful"]
-    b1 = master_kickstarter_df.loc[master_kickstarter_df["status"] == "failed"]
-    c1 = master_kickstarter_df.loc[master_kickstarter_df["status"] == "live"]
-    d1 = master_kickstarter_df.loc[master_kickstarter_df["status"] == "canceled"]
-    e1 = master_kickstarter_df.loc[master_kickstarter_df["status"] == "suspended"]
-
-def remove_bad_columns():
-    global data_df, target_df
     #seperate target variable from data
     #get all the columns of the master_kickstarter_df
     all_master_columns = master_kickstarter_df.columns.values
@@ -118,6 +102,13 @@ def remove_bad_columns():
     target_df = master_kickstarter_df[target_index]
     #get all the other indexes other than target
     data_df = master_kickstarter_df[data_indexes]
+
+def remove_bad_columns():
+    global data_df, target_df, master_kickstarter_df
+    all_master_columns = master_kickstarter_df.columns.values
+    #get the index of the target variable and data index's in their own variables
+    target_index = all_master_columns.tolist().index("status")
+    data_indexes = np.delete(all_master_columns, target_index, None)
     #have to do something about the columns with string sort_values and other problem values
     #<------------Temporary--------------->
     #get all the columns columns which are strings, for which we only need to look at one row
@@ -155,3 +146,19 @@ def remove_bad_columns():
     change_df_col_type(data_df, int64_cols, np.int32)
     change_df_col_type(data_df, float64_cols, np.float32)
     #<------------Temporary--------------->
+
+def extra():
+    global master_kickstarter_df
+    #different statuses
+    #   ['successful', 'failed', 'live', 'canceled', 'suspended']
+    #Series - is one dimensional i think
+    a = master_kickstarter_df.loc[master_kickstarter_df["status"] == "failed"]["goal"]
+    b = master_kickstarter_df.loc[master_kickstarter_df["status"] == "failed"]["pledged"]
+    c = a - b
+    #c is a 'pandas.core.series.Series'from sklearn.model_selection import train_test_split
+    #get the dataframes of the of the datasets of different statuses
+    a1 = master_kickstarter_df.loc[master_kickstarter_df["status"] == "successful"]
+    b1 = master_kickstarter_df.loc[master_kickstarter_df["status"] == "failed"]
+    c1 = master_kickstarter_df.loc[master_kickstarter_df["status"] == "live"]
+    d1 = master_kickstarter_df.loc[master_kickstarter_df["status"] == "canceled"]
+    e1 = master_kickstarter_df.loc[master_kickstarter_df["status"] == "suspended"]
