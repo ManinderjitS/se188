@@ -1,8 +1,11 @@
-This is the index page.
-<h1> Ask for input </h1>
+
+<h1> Your Kickstarter </h1>
 <form action="{% url 'show_result' %}" method="post">
   {% csrf_token %}
-	{{ form.first_classifier}}
+	{{ form.name.label_tag }} {{ form.name }} <br>
+  {{ form.goal.label_tag }} {{ form.goal }} <br>
+  {{ form.pledge.label_tag }} {{ form.pledge }} <br>
+  {{ form.backers.label_tag }} {{ form.backers }} <br>
 	<input type="submit" value="Submit"/>
 </form>
 

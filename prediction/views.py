@@ -14,17 +14,18 @@ import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv
 import os
 
 #saving for later use :- /home/sukhi/School/CollegeM/se188/project/, /home/maninder/School/SE188/project/
-path_to_file = "/home/maninder/School/SE188/project/"
-county_df = pd.DataFrame()
-mapping_df = pd.DataFrame()
+path_to_file = "/home/akshat/.projects/ipython/cmpe188/final_project/"
+county_df = pd.DataFrame() # county data
+mapping_df = pd.DataFrame() # mapping csv
 master_kickstarter_df = pd.DataFrame()
-target_df = pd.DataFrame()
+target_df = pd.DataFrame() # target class
 data_df = pd.DataFrame()
 
 
 # Create your views here.
 def index(request):
     #initialize the dataframes
+    global data_df
     initialize_dataframes()
     seperate_target_and_data()
     remove_bad_columns()
@@ -33,13 +34,18 @@ def index(request):
     context = {
     'form':form
     }
+    print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&",data_df.loc[2])
     print(template_name)
     return render(request, template_name, context)
 
 def show_result(request):
     print("inside show_result")
     template_name = 'show_result.html'
-    result = request.POST.get('first_classifier')
+    name = request.POST.get('name')
+    goal = request.POST.get('goal')
+    pledge = request.POST.get('pledge')
+    backers = request.POST.get('backers')
+    
     context = {
     'result':result
     }
@@ -54,12 +60,19 @@ def show_result_of_database(request):
     x_train, x_test, y_train, y_test = train_test_split(data_df, target_df, test_size=.30, random_state=0)
     dtc = tree.DecisionTreeClassifier(max_depth=None)
     x_train
+
     result_dtc_fit = dtc.fit(x_train, y_train)
     y_predictions = dtc.predict(x_test)
     score_dtc_fit = dtc.score(x_train, y_train)
     accu_score = accuracy_score(y_test, y_predictions)
 
     print('Accuracy for given train:test split 1 = ', accuracy_score(y_test, y_predictions))
+
+    forest = RandomForestClassifier(n_estimators=100, random_state=0, max_depth=7, max_features=5, bootstrap=False)
+    forest.fit(x_train, y_train)
+
+    forest_score_train = forest.score(x_train, y_train)
+    forest_score_test = forest.score(x_test, y_test)
 
     first_ten = data_df.head(10)
     column_list = data_df.columns.values
@@ -69,13 +82,11 @@ def show_result_of_database(request):
         'column_list':column_list,
         'result_dtc_fit':result_dtc_fit,
         'score_dtc_fit':score_dtc_fit,
-        'accuracy_score':accu_score
+        'accuracy_score_dtc':accu_score,
+        'random_forest_score_train':forest_score_train,
+        'random_forest_score_test':forest_score_test
     }
     return render(request, template_name, context)
-
-def change_df_col_type(df, indexes, type):
-    for i in indexes:
-        df[i] = df[i].astype(type)
 
 #helper methods########################################
 def selected_column():
@@ -97,12 +108,13 @@ def seperate_target_and_data():
     target_index = all_master_columns.tolist().index("status")
     data_indexes = np.delete(all_master_columns, target_index, None)
     #get the value at target_index, then store it in target_index
-    target_index = all_master_columns[target_index]
+    target_column_name = all_master_columns[target_index]
     #parse the target from master_kickstarter_df table
-    target_df = master_kickstarter_df[target_index]
+    target_df = master_kickstarter_df[target_column_name]
     #get all the other indexes other than target
     data_df = master_kickstarter_df[data_indexes]
 
+#comes after seperate_target_and_data()
 def remove_bad_columns():
     global data_df, target_df, master_kickstarter_df
     all_master_columns = master_kickstarter_df.columns.values
@@ -126,7 +138,13 @@ def remove_bad_columns():
     #data without any string valued columns
     data_df = master_kickstarter_df[data_indexes]
     #replace all the "nan" and "inf" valeus from the columns
-    data_df = data_df.fillna(0)
+    for column in data_df:
+        mean = data_df[column].mean()
+        data_df[column] = data_df[column].fillna(mean)
+        print(mean)
+
+    #data_df = data_df.fillna(0)
+    # data_df["column_name"].fillna(data_df["column_name"].mean())
     #convert values from 64 types to 32 types
     test_row = data_df.loc[4313]
     temp1 = [] #for all the int64 columns
@@ -145,7 +163,12 @@ def remove_bad_columns():
     #call the method that does that for both
     change_df_col_type(data_df, int64_cols, np.int32)
     change_df_col_type(data_df, float64_cols, np.float32)
+    data_df = data_df.drop('pledged',1)
     #<------------Temporary--------------->
+
+def change_df_col_type(df, indexes, type):
+    for i in indexes:
+        df[i] = df[i].astype(type)
 
 def extra():
     global master_kickstarter_df

@@ -7,7 +7,11 @@
 {% endfor %}
 </table>
 
-<h1> Results are as follows: </h1>
+<h1> Results for the Decision Tree: </h1>
 <br> Results_dtc : {{result_dtc_fit}}
 <br> Score_dtc: {{score_dtc_fit}}
-<br> Accuracy: {{accuracy_score}}
+<br> Accuracy: {{accuracy_score_dtc}}
+
+<h1> Results for the Random Forest: </h1>
+<br> Results random forest train: {{random_forest_score_train}}
+<br> Results random forest test: {{random_forest_score_test}}
